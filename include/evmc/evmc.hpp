@@ -700,20 +700,22 @@ public:
                    evmc_host_context* ctx,
                    evmc_revision rev,
                    const evmc_message& msg,
+                   const evmc_bytes32* code_hash,
                    const uint8_t* code,
                    size_t code_size) noexcept
     {
-        return Result{m_instance->execute(m_instance, &host, ctx, rev, &msg, code, code_size)};
+        return Result{m_instance->execute(m_instance, &host, ctx, rev, &msg, code_hash, code, code_size)};
     }
 
     /// Convenient variant of the VM::execute() that takes reference to evmc::Host class.
     Result execute(Host& host,
                    evmc_revision rev,
                    const evmc_message& msg,
+                   const evmc_bytes32* code_hash,
                    const uint8_t* code,
                    size_t code_size) noexcept
     {
-        return execute(Host::get_interface(), host.to_context(), rev, msg, code, code_size);
+        return execute(Host::get_interface(), host.to_context(), rev, msg, code_hash, code, code_size);
     }
 
     /// Executes code without the Host context.
@@ -726,11 +728,12 @@ public:
     /// guaranteed not to require any Host access.
     Result execute(evmc_revision rev,
                    const evmc_message& msg,
+                   const evmc_bytes32* code_hash,
                    const uint8_t* code,
                    size_t code_size) noexcept
     {
         return Result{
-            m_instance->execute(m_instance, nullptr, nullptr, rev, &msg, code, code_size)};
+            m_instance->execute(m_instance, nullptr, nullptr, rev, &msg, code_hash, code, code_size)};
     }
 
     /// Returns the pointer to C EVMC struct representing the VM.

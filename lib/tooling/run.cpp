@@ -37,7 +37,7 @@ auto bench(MockedHost& host,
 
         // Probe run: execute once again the already warm code to estimate a single run time.
         const auto probe_start = clock::now();
-        const auto result = vm.execute(host, rev, msg, code.data(), code.size());
+        const auto result = vm.execute(host, rev, msg, nullptr, code.data(), code.size());
         const auto bench_start = clock::now();
         const auto probe_time = bench_start - probe_start;
 
@@ -50,7 +50,7 @@ auto bench(MockedHost& host,
         // Benchmark loop.
         const auto num_iterations = std::max(static_cast<int>(target_bench_time / probe_time), 1);
         for (int i = 0; i < num_iterations; ++i)
-            vm.execute(host, rev, msg, code.data(), code.size());
+            vm.execute(host, rev, msg, nullptr, code.data(), code.size());
         const auto bench_time = (clock::now() - bench_start) / num_iterations;
 
         out << "Time:     " << std::chrono::duration_cast<unit>(bench_time).count() << unit_name
@@ -86,7 +86,7 @@ int run(VM& vm,
         create_msg.recipient = create_address;
         create_msg.gas = create_gas;
 
-        const auto create_result = vm.execute(host, rev, create_msg, code.data(), code.size());
+        const auto create_result = vm.execute(host, rev, create_msg, nullptr, code.data(), code.size());
         if (create_result.status_code != EVMC_SUCCESS)
         {
             out << "Contract creation failed: " << create_result.status_code << "\n";
@@ -101,7 +101,7 @@ int run(VM& vm,
     }
     out << "\n";
 
-    const auto result = vm.execute(host, rev, msg, exec_code.data(), exec_code.size());
+    const auto result = vm.execute(host, rev, msg, nullptr, exec_code.data(), exec_code.size());
 
     if (bench)
         tooling::bench(host, vm, rev, msg, exec_code, result, out);

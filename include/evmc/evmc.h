@@ -1001,6 +1001,7 @@ enum evmc_revision
  *                   The VM MUST NOT dereference the pointer.
  * @param rev        The requested EVM specification revision.
  * @param msg        The call parameters. See ::evmc_message. This argument MUST NOT be NULL.
+ * @param code_hash  The hash of the code to be executed. This argument MAY be NULL.
  * @param code       The reference to the code to be executed. This argument MAY be NULL.
  * @param code_size  The length of the code. If @p code is NULL this argument MUST be 0.
  * @return           The execution result.
@@ -1010,6 +1011,7 @@ typedef struct evmc_result (*evmc_execute_fn)(struct evmc_vm* vm,
                                               struct evmc_host_context* context,
                                               enum evmc_revision rev,
                                               const struct evmc_message* msg,
+                                              const evmc_bytes32* code_hash,
                                               uint8_t const* code,
                                               size_t code_size);
 
