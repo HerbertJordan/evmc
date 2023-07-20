@@ -195,6 +195,10 @@ func (vm *VM) SetOption(name string, value string) (err error) {
 	return err
 }
 
+func (vm *VM) GetHandle() unsafe.Pointer {
+	return unsafe.Pointer(vm.handle)
+}
+
 type Parameters struct {
 	Context   HostContext
 	Revision  Revision
