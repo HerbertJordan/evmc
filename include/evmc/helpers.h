@@ -349,10 +349,13 @@ static inline struct evmc_step_result evmc_step_n(struct evmc_vm_steppable* vm,
                                                   size_t stack_size,
                                                   uint8_t* memory,
                                                   size_t memory_size,
-                                                  int32_t steps)
+                                                  int32_t steps,
+                                                  uint8_t* output_data,
+                                                  size_t output_size)
 {
     return vm->step_n(vm, host, context, rev, msg, code_hash, code, code_size, status, pc,
-                      gas_refunds, stack, stack_size, memory, memory_size, steps);
+                      gas_refunds, stack, stack_size, memory, memory_size, steps, output_data,
+                      output_size);
 }
 
 /** @} */

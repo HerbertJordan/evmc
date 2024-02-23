@@ -1293,6 +1293,8 @@ struct evmc_vm_steppable;
  * @param memory      The memory used for execution.
  * @param memory_size The size of the memory.
  * @param steps       The number of steps to execute.
+ * @param output_data The reference to output data.
+ * @param output_size The size of output data.
  * @return            The step result.
  */
 typedef struct evmc_step_result (*evmc_step_n_fn)(struct evmc_vm_steppable* vm,
@@ -1310,7 +1312,9 @@ typedef struct evmc_step_result (*evmc_step_n_fn)(struct evmc_vm_steppable* vm,
                                                   size_t stack_size,
                                                   uint8_t* memory,
                                                   size_t memory_size,
-                                                  int32_t steps);
+                                                  int32_t steps,
+                                                  uint8_t* output_data,
+                                                  size_t output_size);
 
 /**
  * Destroys the VM instance.

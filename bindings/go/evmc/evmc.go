@@ -72,7 +72,9 @@ static struct evmc_step_result step_n_wrapper(struct evmc_vm_steppable* vm,
                                               size_t stack_size,
                                               uint8_t* memory,
                                               size_t memory_size,
-                                              int32_t steps)
+                                              int32_t steps,
+                                              uint8_t* output_data,
+                                              size_t output_size)
 {
     struct evmc_message msg = {
         kind,    flags,      depth,      gas,    *recipient,
@@ -82,7 +84,7 @@ static struct evmc_step_result step_n_wrapper(struct evmc_vm_steppable* vm,
 
     struct evmc_host_context* context = (struct evmc_host_context*)context_index;
     return evmc_step_n(vm, &evmc_go_host, context, rev, &msg, code_hash, code, code_size, status,
-                       pc, gas_refunds, stack, stack_size, memory, memory_size, steps);
+                       pc, gas_refunds, stack, stack_size, memory, memory_size, steps, output_data, output_size);
 }
 */
 import "C"
@@ -347,6 +349,7 @@ type StepParameters struct {
 	Recipient      Address
 	Sender         Address
 	Input          []byte
+	Output         []byte
 	Value          Hash
 	CodeHash       *Hash
 	Code           []byte
@@ -397,14 +400,31 @@ func (vm *VMSteppable) StepN(params StepParameters) (res StepResult, err error) 
 		memory = (*C.uint8_t)(unsafe.Pointer(&params.Memory[0]))
 	}
 
-	result := C.step_n_wrapper(vm.handle, C.uintptr_t(ctxId),
-		uint32(params.Revision), C.enum_evmc_call_kind(params.Kind), flags,
-		C.int32_t(params.Depth), C.int64_t(params.Gas), &evmcRecipient,
-		&evmcSender, bytesPtr(params.Input), C.size_t(len(params.Input)), &evmcValue,
-		codeHash, bytesPtr(params.Code), C.size_t(len(params.Code)),
-		C.enum_evmc_step_status_code(params.StepStatusCode), C.uint64_t(params.Pc),
-		C.int64_t(params.GasRefund), stack, C.size_t(len(params.Stack)/32), memory,
-		C.size_t(len(params.Memory)), C.int32_t(params.NumSteps))
+	result := C.step_n_wrapper(vm.handle,
+		C.uintptr_t(ctxId),
+		uint32(params.Revision),
+		C.enum_evmc_call_kind(params.Kind),
+		flags,
+		C.int32_t(params.Depth),
+		C.int64_t(params.Gas),
+		&evmcRecipient,
+		&evmcSender,
+		bytesPtr(params.Input),
+		C.size_t(len(params.Input)),
+		&evmcValue,
+		codeHash,
+		bytesPtr(params.Code),
+		C.size_t(len(params.Code)),
+		C.enum_evmc_step_status_code(params.StepStatusCode),
+		C.uint64_t(params.Pc),
+		C.int64_t(params.GasRefund),
+		stack,
+		C.size_t(len(params.Stack)/32),
+		memory,
+		C.size_t(len(params.Memory)),
+		C.int32_t(params.NumSteps),
+		bytesPtr(params.Output),
+		C.size_t(len(params.Output)))
 
 	removeHostContext(ctxId)
 
