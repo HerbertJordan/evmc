@@ -72,9 +72,9 @@ static struct evmc_step_result step_n_wrapper(struct evmc_vm_steppable* vm,
                                               size_t stack_size,
                                               uint8_t* memory,
                                               size_t memory_size,
-                                              int32_t steps,
-                                              uint8_t* output_data,
-                                              size_t output_size)
+                                              uint8_t* last_call_result_data ,
+                                              size_t last_call_result_data_size,
+                                              int32_t steps)
 {
     struct evmc_message msg = {
         kind,    flags,      depth,      gas,    *recipient,
@@ -84,7 +84,7 @@ static struct evmc_step_result step_n_wrapper(struct evmc_vm_steppable* vm,
 
     struct evmc_host_context* context = (struct evmc_host_context*)context_index;
     return evmc_step_n(vm, &evmc_go_host, context, rev, &msg, code_hash, code, code_size, status,
-                       pc, gas_refunds, stack, stack_size, memory, memory_size, steps, output_data, output_size);
+                       pc, gas_refunds, stack, stack_size, memory, memory_size, last_call_result_data, last_call_result_data_size, steps);
 }
 */
 import "C"
@@ -349,7 +349,7 @@ type StepParameters struct {
 	Recipient      Address
 	Sender         Address
 	Input          []byte
-	Output         []byte
+	LastCallResult []byte
 	Value          Hash
 	CodeHash       *Hash
 	Code           []byte
@@ -422,9 +422,9 @@ func (vm *VMSteppable) StepN(params StepParameters) (res StepResult, err error) 
 		C.size_t(len(params.Stack)/32),
 		memory,
 		C.size_t(len(params.Memory)),
-		C.int32_t(params.NumSteps),
-		bytesPtr(params.Output),
-		C.size_t(len(params.Output)))
+		bytesPtr(params.LastCallResult),
+		C.size_t(len(params.LastCallResult)),
+		C.int32_t(params.NumSteps))
 
 	removeHostContext(ctxId)
 
