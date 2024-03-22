@@ -72,8 +72,8 @@ static struct evmc_step_result step_n_wrapper(struct evmc_vm_steppable* vm,
                                               size_t stack_size,
                                               uint8_t* memory,
                                               size_t memory_size,
-                                              uint8_t* last_call_result_data ,
-                                              size_t last_call_result_data_size,
+                                              uint8_t* last_call_return_data ,
+                                              size_t last_call_return_data_size,
                                               int32_t steps)
 {
     struct evmc_message msg = {
@@ -84,7 +84,7 @@ static struct evmc_step_result step_n_wrapper(struct evmc_vm_steppable* vm,
 
     struct evmc_host_context* context = (struct evmc_host_context*)context_index;
     return evmc_step_n(vm, &evmc_go_host, context, rev, &msg, code_hash, code, code_size, status,
-                       pc, gas_refunds, stack, stack_size, memory, memory_size, last_call_result_data, last_call_result_data_size, steps);
+                       pc, gas_refunds, stack, stack_size, memory, memory_size, last_call_return_data, last_call_return_data_size, steps);
 }
 */
 import "C"
@@ -361,15 +361,16 @@ type StepParameters struct {
 }
 
 type StepResult struct {
-	StepStatusCode StepStatus
-	StatusCode     Error
-	Revision       Revision
-	Pc             uint64
-	GasLeft        int64
-	GasRefund      int64
-	Output         []byte
-	Stack          []byte
-	Memory         []byte
+	StepStatusCode     StepStatus
+	StatusCode         Error
+	Revision           Revision
+	Pc                 uint64
+	GasLeft            int64
+	GasRefund          int64
+	Output             []byte
+	Stack              []byte
+	Memory             []byte
+	LastCallReturnData []byte
 }
 
 func (vm *VMSteppable) StepN(params StepParameters) (res StepResult, err error) {
@@ -437,6 +438,7 @@ func (vm *VMSteppable) StepN(params StepParameters) (res StepResult, err error) 
 	res.Output = C.GoBytes(unsafe.Pointer(result.output_data), C.int(result.output_size))
 	res.Stack = C.GoBytes(unsafe.Pointer(result.stack), C.int(result.stack_size*32))
 	res.Memory = C.GoBytes(unsafe.Pointer(result.memory), C.int(result.memory_size))
+	res.LastCallReturnData = C.GoBytes(unsafe.Pointer(result.last_call_return_data), C.int(result.last_call_return_data_size))
 
 	if result.release != nil {
 		C.evmc_release_step_result(&result)

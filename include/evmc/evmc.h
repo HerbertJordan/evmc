@@ -1244,6 +1244,25 @@ struct evmc_step_result
     size_t memory_size;
 
     /**
+     * A buffer containing the output of the last recursive EVM call.
+     *
+     * The output contains data coming from CALL and CREATE instructions.
+     *
+     * The memory containing the output data is owned by EVM and has to be
+     * freed with evmc_step_result::release().
+     *
+     * This pointer MAY be NULL.
+     */
+    const uint8_t* last_call_return_data;
+
+    /**
+     * The size of the data returned by the last call.
+     *
+     * If evmc_step_result::last_call_return_data is NULL this MUST be 0.
+     */
+    size_t last_call_return_data_size;
+
+    /**
      * The method releasing all resources associated with the step result object.
      *
      * This method (function pointer) is optional (MAY be NULL) and MAY be set
